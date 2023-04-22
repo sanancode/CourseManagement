@@ -299,7 +299,6 @@ namespace CourseManagement.Management
         {
             if (Storage.groups.Count > 0)
             {
-                Console.WriteLine("\nAll groups in the system...\n");
                 ShowAllGroups();
 
                 //hansi grupun telebe sayisini gostermek isteyir onu sorusur
@@ -307,13 +306,12 @@ namespace CourseManagement.Management
 
                 //result
                 Console.WriteLine(
-                    $"Student count in: {Storage.groups[groupindex].GroupNO}: " +
-                    $"{Storage.groups[groupindex].Category} is: " +
-                    $"{Storage.groups[groupindex].Students.Count}");
+                    $"\nStudent count in {Storage.groups[groupindex-1].GroupNO}: is: " +
+                    $"{Storage.groups[groupindex-1].Students.Count}");
             }
             else
             {
-                Console.WriteLine("\nThere is not any registered students in the system...\n");
+                Console.WriteLine("\nThere is not any registered groups in the system...\n");
                 return;
             }
         }
