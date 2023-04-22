@@ -7,7 +7,7 @@ namespace CourseManagement.Main
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("\tWelcome to Course Management Sytem\n");
+            Console.WriteLine("\tWelcome to Course Management System\n");
             run();
             Console.WriteLine("\n\tProgram ended...");
         }
@@ -73,7 +73,7 @@ namespace CourseManagement.Main
             }
             else
             {
-                Console.WriteLine("\nPlease select menu between 1 and 6");
+                Console.WriteLine("\nPlease select menu between 1 and 5");
                 RunGroup();
                 return;
             }

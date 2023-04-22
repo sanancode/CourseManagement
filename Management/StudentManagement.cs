@@ -1,4 +1,6 @@
-﻿using CourseManagement.Utility;
+﻿using CourseManagement.Main;
+using CourseManagement.Models;
+using CourseManagement.Utility;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,71 +14,97 @@ namespace CourseManagement.Management
     {
         public static void ShowAllStudents()
         {
-            Console.WriteLine("\nAll students in the system...\n");
-            int row = 1; //sira nomresi
-
+            //her hansi bir qrupda telebe olub olmadigini yoxlayir
+            bool flag = false;
             for (int i = 0; i < Storage.groups.Count; i++)
             {
-                for (int j = 0; j < Storage.groups[i].Students.Count; j++)
-                {
-                    //Telebenin melumatlarini capa verir
-                    Console.WriteLine($"{row}. {Storage.groups[i].Students[j].Fullname}");
-                    Console.WriteLine($" - ID: {Storage.groups[i].Students[j].Id}");
-                    Console.WriteLine($" - GroupNo: {Storage.groups[i].Students[j].GroupNo}");
-                    Console.WriteLine($" - Type: {Storage.groups[i].Students[j].Type}");
-                    Console.WriteLine($" - IsOnline: {Storage.groups[i].GetStringIsOnline()}");
-                    Console.WriteLine($" - Category: {Storage.groups[i].Category}");
+                if (Storage.groups[i].Students.Count > 0) flag = true;
+            }
 
-                    row++;
+            //esas proses
+            if (flag)
+            {
+                Console.WriteLine("\nAll students in the system...\n");
+                int row = 1; //sira nomresi
+
+                for (int i = 0; i < Storage.groups.Count; i++)
+                {
+                    for (int j = 0; j < Storage.groups[i].Students.Count; j++)
+                    {
+                        //Telebenin melumatlarini capa verir
+                        Console.WriteLine($"\n{row}. {Storage.groups[i].Students[j].Fullname}");
+                        Console.WriteLine($" - ID: {Storage.groups[i].Students[j].Id}");
+                        Console.WriteLine($" - GroupNo: {Storage.groups[i].Students[j].GroupNo}");
+                        Console.WriteLine($" - Type: {Storage.groups[i].Students[j].Type}");
+                        Console.WriteLine($" - IsOnline: {Storage.groups[i].GetStringIsOnline()}");
+                        Console.WriteLine($" - Category: {Storage.groups[i].Category}");
+
+                        row++;
+                    }
                 }
+            }
+            else
+            {
+                Console.WriteLine("\nThere is not any registered students in the system...\n");
+                return;
             }
         }
 
         public static void AddNewStudent()
         {
+
             Console.WriteLine("\n\tStudent Registration...\n");
             bool flag = true;
             bool flag2 = false; //group indexini iki defe capa vermemek ucun
 
-            //get all infos from console
-            string studentid = CommonMethods.getString("Student id: ");
-            string fullname = CommonMethods.getString("Student id: ");
-            string type = CommonMethods.getString("Type: ");
-
-            //groupn no
-            GroupManagement.ShowAllGroups(); //-ilk once butun grouplari gosterir
-            int groupindex = CommonMethods.getInteger("\nPlease select the group index: ");
-
-            if (CommonMethods.CheckMenuRange(groupindex, 1, Storage.groups.Count))
+            //registrate olunmus grup varmi deye yoxla
+            if (Storage.groups.Count > 0)
             {
-                do
+                //get all infos from console
+                string studentid = CommonMethods.getString("Student id: ");
+                string fullname = CommonMethods.getString("Student fullname: ");
+                string type = CommonMethods.getString("Type: ");
+
+                //groupn no
+                GroupManagement.ShowAllGroups(); //-ilk once butun grouplari gosterir
+                int groupindex = CommonMethods.getInteger("\nPlease select the group index: ");
+
+                if (CommonMethods.CheckMenuRange(groupindex, 1, Storage.groups.Count))
                 {
-                    if (flag2)
+                    do
                     {
-                        groupindex = CommonMethods.getInteger("\nPlease select the group index: ");
-                    }
+                        if (flag2)
+                        {
+                            groupindex = CommonMethods.getInteger("\nPlease select the group index: ");
+                        }
 
-                    string groupno = Storage.groups[groupindex - 1].GroupNO;
+                        string groupno = Storage.groups[groupindex - 1].GroupNO;
 
-                    //grupda yer varmi deye yoxlamalidir
-                    if (Storage.groups[groupindex - 1].Students.Count < Storage.groups[groupindex - 1].Limit)
-                    {
-                        Storage.groups[groupindex - 1].Students.Add(new Models.Student(studentid, fullname, type, groupno));
-                        Console.WriteLine("\nStudent resgitration completed...");
-                        Console.WriteLine($"{fullname} added to {groupno}\n");
-                        flag = false;
-                    }
-                    else
-                    {
-                        Console.WriteLine("\nGroup is full...Please try another one...\n");
-                        flag2 = true;
-                    }
-                } while (flag);
+                        //grupda yer varmi deye yoxlamalidir
+                        if (Storage.groups[groupindex - 1].Students.Count < Storage.groups[groupindex - 1].Limit)
+                        {
+                            Storage.groups[groupindex - 1].Students.Add(new Models.Student(studentid, fullname, groupno, type));
+                            Console.WriteLine("\nStudent registration completed...");
+                            Console.WriteLine($"{fullname} added to {groupno}\n");
+                            flag = false;
+                        }
+                        else
+                        {
+                            Console.WriteLine("\nGroup is full...Please try another one...\n");
+                            flag2 = true;
+                        }
+                    } while (flag);
+                }
+                else
+                {
+                    Console.WriteLine($"\nPlease select the group number between 1 and {Storage.groups.Count}\n");
+                    AddNewStudent();
+                    return;
+                }
             }
             else
             {
-                Console.WriteLine($"\nPlease select the group number between 1 and {Storage.groups.Count}\n");
-                AddNewStudent();
+                Console.WriteLine($"\nThere is not any registered group in the system\n");
                 return;
             }
         }
@@ -85,40 +113,44 @@ namespace CourseManagement.Management
         {
             Console.WriteLine("\nAll students...\n");
 
-            int groupindex = 0;
-            int studentindex = 0;
-
-            //Telebenin adresi teyin edilir
-            groupindex = CommonMethods.DetermineStudentAddress().Item1;
-            studentindex = CommonMethods.DetermineStudentAddress().Item2;
-
-            //menudan bolme secilir
-            MenuUtil.EditStudentGroup();
-            int menu = CommonMethods.SelectMenuAbove();
-
-            //edit menyusunun alt menyusu secilir
-            if (CommonMethods.CheckMenuRange(menu, 1, 4))
+            if (Storage.groups.Count > 0)
             {
-                switch (menu)
+                //Telebenin adresi teyin edilir
+                var (groupindex, studentindex) = CommonMethods.DetermineStudentAddress();
+
+                //menudan bolme secilir
+                MenuUtil.EditStudentGroup();
+                int menu = CommonMethods.SelectMenuAbove();
+
+                //edit menyusunun alt menyusu secilir
+                if (CommonMethods.CheckMenuRange(menu, 1, 4))
                 {
-                    case 1:
-                        EditStudent1(groupindex, studentindex);
-                        break;
-                    case 2:
-                        EditStudent2(groupindex, studentindex);
-                        break;
-                    case 3:
-                        EditStudent3(groupindex, studentindex);
-                        break;
-                    case 4:
-                        EditStudent4(groupindex, studentindex);
-                        break;
+                    switch (menu)
+                    {
+                        case 1:
+                            EditStudent1(groupindex, studentindex);
+                            break;
+                        case 2:
+                            EditStudent2(groupindex, studentindex);
+                            break;
+                        case 3:
+                            EditStudent3(groupindex, studentindex);
+                            break;
+                        case 4:
+                            EditStudent4(groupindex, studentindex);
+                            break;
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("\nPlease select the menu between 1 and 4\n");
+                    EditStudent();
+                    return;
                 }
             }
             else
             {
-                Console.WriteLine("\nPlease select the menu between 1 and 4\n");
-                EditStudent();
+                Console.WriteLine("\nThere is not any registered students in the system...\n");
                 return;
             }
         }
@@ -185,22 +217,19 @@ namespace CourseManagement.Management
 
         public static void DeleteStudent()
         {
-            int groupindex = 0;
-            int studentindex = 0;
+            if (Storage.groups.Count > 0)
+            {
+                //Telebenin adresi teyin edilir
+                var (groupindex, studentindex) = CommonMethods.DetermineStudentAddress();
 
-            //Telebenin adresi teyin edilir
-            groupindex = CommonMethods.DetermineStudentAddress().Item1;
-            studentindex = CommonMethods.DetermineStudentAddress().Item2;
-
-            Storage.groups[groupindex].Students.RemoveAt(studentindex);
-            Console.WriteLine($"\nStudent: {Storage.groups[groupindex].Students[studentindex].Fullname} deleted...\n");
+                Console.WriteLine($"\nStudent: {Storage.groups[groupindex].Students[studentindex].Fullname} deleted...\n");
+                Storage.groups[groupindex].Students.RemoveAt(studentindex);
+            }
+            else
+            {
+                Console.WriteLine("\nThere is not any registered students in the system...\n");
+                return;
+            }
         }
     }
 }
-
-
-
-
-
-
-

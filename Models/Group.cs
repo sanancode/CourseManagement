@@ -20,14 +20,17 @@ namespace CourseManagement.Models
             GroupNO = groupno;
             Category = category;
             IsOnline = isonline;
-            Students = new List<Student>(); //initialize
 
             if (IsOnline == true)
             {
                 Limit = 15;
-                return;
             }
-            Limit = 10;
+            else
+            {
+                Limit = 10;
+            }
+
+            Students = new List<Student>(); //initialize
         }
 
         public string GetStringIsOnline()

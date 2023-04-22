@@ -11,7 +11,7 @@ namespace CourseManagement.Utility
         public static void MainMenu()
         {
             Console.WriteLine(
-                "\n1. Group Operaions" +
+                "\n1. Group Operations" +
                 "\n2. Student Operations" +
                 "\n3. Exit the system");
         }
